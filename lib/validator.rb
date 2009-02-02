@@ -405,7 +405,7 @@ class Validator
     set_rxml_error do
       @xml = io_or_document.respond_to?(:read) ?
         XML::Document.io(io_or_document) :
-        XML::Dcoument.string(io_or_document)
+        XML::Document.string(io_or_document)
     end
   end
 
@@ -454,8 +454,15 @@ class Validator
     @errors.empty?
   end
 
+  # returns true iff the document is at least some valid form of XML
+  def valid_xml?
+    !(@xml.nil?)
+  end
+
   # returns a list of perceived errors with the document.
   def errors
+    checkschema
+    checkbestpractices
     @errors.clone
   end
 

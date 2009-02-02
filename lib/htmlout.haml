@@ -1,0 +1,39 @@
+!!! XML
+!!! Strict
+%html{ :xmlns=>"http://www.w3.org/1999/xhtml", "xml:lang"=>"en", :lang=>"en" }
+  %head
+    %title PBCore Validator
+    %style{ :type => "text/css"}
+      :sass
+        body, html
+          :font-family sans-serif
+        textarea
+          :width 85%
+          :height 200px
+          :font-family monospace
+        .s
+          :font-weight bold
+        .success
+          :color green
+        .failure
+          :color red
+  %body
+    %h1 PBCore Validator
+    - if validator.valid?
+      %p
+        %span.success
+          Congratulations!
+        I couldn't find any errors in the PBCore document you provided. Congratulations!
+
+    - else
+      %p
+        %span.failure
+          Sorry.
+        The following potential errors were found in your PBCore document:
+      %ul#errors
+        - validator.errors.each do |error|
+          %li
+            &= error.to_s
+      - if !validator.valid_xml?
+        %p
+          Note that these errors indicate that your input could not even be parsed as XML. Please fix those errors in order to allow the PBCore-specific checks to be run.
