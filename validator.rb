@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 # PBCore Validator, main file
 # Copyright © 2009 Roasted Vermicelli, LLC
 #
@@ -14,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$: << File.expand_path(File.dirname(__FILE__) + "/../lib")
+$: << File.expand_path(File.join(File.dirname(__FILE__), "lib"))
 
 require 'rubygems'
 require 'lib/validator'
