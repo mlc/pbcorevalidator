@@ -400,6 +400,7 @@ class Validator
   #
   # io_or_document can either be an IO object or a String containing an XML document.
   def initialize(io_or_document)
+    XML.default_line_numbers = true
     @errors = []
     set_rxml_error do
       @xml = io_or_document.respond_to?(:read) ?
@@ -425,6 +426,7 @@ class Validator
     return if @practices_checked || @xml.nil?
 
     check_picklist('titleType', Picklists::TITLE_TYPES)
+    check_lists('subject')
     check_picklist('descriptionType', Picklists::DESCRIPTION_TYPES)
     check_picklist('genre', Picklists::GENRES)
     check_picklist('relationType', Picklists::RELATION_TYPES)
@@ -442,6 +444,7 @@ class Validator
     check_names('creator')
     check_names('contributor')
     check_names('publisher')
+    check_only_one_format
   end
 
   # returns true iff the document is perfectly okay
@@ -481,22 +484,44 @@ class Validator
 
   private
   def check_picklist(elt, picklist)
-    @xml.find("//pbcore:#{elt}", "pbcore:#{PBCORE_NAMESPACE}").each do |node|
+    each_elt(elt) do |node|
       unless picklist.include?(node.content)
-        @errors << "“#{node.content}” is not in the PBCore suggested picklist value for #{elt}."
+        @errors << "“#{node.content}” on line #{node.line_num} is not in the PBCore suggested picklist value for #{elt}."
       end
+    end
+    check_lists(elt)
+  end
+
+  def check_lists(elt)
+    each_elt(elt) do |node|
       if node.content =~ /[,|;]/
-        @errors << "In #{elt}, you have entered “#{node.content}”, which looks like it may be a list. It is preferred instead to repeat the containing element."
+        @errors << "In #{elt} on line #{node.line_num}, you have entered “#{node.content}”, which looks like it may be a list. It is preferred instead to repeat the containing element."
       end
     end
   end
 
   # look for "Mike Castleman" and remind the user to say "Castleman, Mike" instead.
   def check_names(elt)
-    @xml.find("//pbcore:#{elt}", "pbcore:#{PBCORE_NAMESPACE}").each do |node|
+    each_elt(elt) do |node|
       if node.content =~ /^(\w+\.?(\s\w+\.?)?)\s+(\w+)$/
-        @errors << "It looks like the #{elt} “#{node.content}” might be a person's name. If it is, then it is preferred to have it like “#{$3}, #{$1}”."
+        @errors << "It looks like the #{elt} “#{node.content}” on line #{node.line_num} might be a person's name. If it is, then it is preferred to have it like “#{$3}, #{$1}”."
       end
+    end
+  end
+
+  # ensure that no single instantiation has both a formatDigital and a formatPhysical
+  def check_only_one_format
+    each_elt("pbcoreInstantiation") do |node|
+      if node.find(".//pbcore:formatDigital", "pbcore:#{PBCORE_NAMESPACE}").size > 0 &&
+          node.find(".//pbcore:formatPhysical", "pbcore:#{PBCORE_NAMESPACE}").size > 0
+        @errors << "It looks like the instantiation on line #{node.line_num} contains both a formatDigital and a formatPhysical element. This is probably not what you intended."
+      end
+    end
+  end
+
+  def each_elt(elt)
+    @xml.find("//pbcore:#{elt}", "pbcore:#{PBCORE_NAMESPACE}").each do |node|
+      yield node
     end
   end
 end
