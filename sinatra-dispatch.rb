@@ -22,28 +22,25 @@ require 'rubygems'
 
 require 'cgi'
 require 'haml'
-require 'libxml'
+require 'sinatra'
 
 require 'lib/validator'
 
-cgi = CGI.new
+set :public, File.dirname(__FILE__) + '/html'
+set :views, File.dirname(__FILE__) + '/templates'
 
-def fail(cgi, message)
-  cgi.out("type" => "text/plain", "charset" => "utf-8", "status" => "OK") do
-    message
+get '/validator' do
+  "Sorry, only POST is supported."
+end
+
+post '/validator' do
+  if params[:file][:tempfile] && params[:file][:tempfile].size > 0
+    @validator = Validator.new(params[:file][:tempfile])
+  elsif !params[:textarea].strip.empty?
+    @validator = Validator.new(params[:textarea])
+  else
+    halt "You must provide a PBCore document either by file upload or by pasting into the textarea."
   end
-  exit 0
-end
 
-@validator = if cgi.params["file"].respond_to?(:read)
-  Validator.new(cgi.params["file"])
-elsif !(cgi.params["textarea"].empty? || cgi.params["textarea"][0].empty?)
-  Validator.new(cgi.params["textarea"][0])
-else
-  fail(cgi, "You must provide a PBCore document either by file upload or by pasting into the textarea.")
-end
-
-engine = Haml::Engine.new(File.read(File.join(File.dirname(__FILE__), "lib", "htmlout.haml")))
-cgi.out("type" => "text/html", "charset" => "utf-8") do
-  engine.to_html(Object.new, { :validator => @validator })
+  haml :htmlout
 end

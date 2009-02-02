@@ -424,7 +424,8 @@ class Validator
   # this is subjective, of course.
   def checkbestpractices
     return if @practices_checked || @xml.nil?
-
+    @practices_checked = true
+    
     check_picklist('titleType', Picklists::TITLE_TYPES)
     check_lists('subject')
     check_picklist('descriptionType', Picklists::DESCRIPTION_TYPES)
