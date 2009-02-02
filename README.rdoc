@@ -8,6 +8,8 @@ You need the folowing gems:
 * rake
 
 If you want to run a webserver, also have:
-* fcgi
+* rack
+* sinatra
+* thin
 
 Further documentation is forthcoming.
