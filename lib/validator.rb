@@ -493,7 +493,9 @@ class Validator
   private
   def check_picklist(elt, picklist)
     each_elt(elt) do |node|
-      unless picklist.include?(node.content)
+      if node.content.strip.empty?
+        @errors << "#{elt} on #{node.line_num} is empty. Perhaps consider leaving that element out instead."
+      elsif !picklist.any?{|i| i.downcase == node.content.downcase}
         @errors << "“#{node.content}” on line #{node.line_num} is not in the PBCore suggested picklist value for #{elt}."
       end
     end
