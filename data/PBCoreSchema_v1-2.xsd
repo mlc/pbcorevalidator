@@ -93,7 +93,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreSubject">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="subject" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="subject" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor subject is used to
                               assign topical headings or keywords that portray the intellectual
@@ -159,7 +159,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreGenre">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="genre"
+                     <xsd:element maxOccurs="1" minOccurs="1" name="genre"
                         type="pbcore.string.type.base">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor genre describes the
@@ -194,7 +194,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreRelation">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="relationType"
+                     <xsd:element maxOccurs="1" minOccurs="1" name="relationType"
                         type="pbcore.string.type.base">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor relationType identifies
@@ -204,7 +204,7 @@
                               http://www.utah.edu/cpbmetadata/PBCore/picklists/picklist_relationType.html"</xsd:documentation>
                         </xsd:annotation>
                      </xsd:element>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="relationIdentifier"
+                     <xsd:element maxOccurs="1" minOccurs="1" name="relationIdentifier"
                         type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"Once the type of relationship between
@@ -223,7 +223,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreCoverage">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="coverage" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="coverage" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en"> "The descriptor coverage uses keywords
                               to identify a span of space or time that is expressed by the
@@ -239,7 +239,7 @@
                               http://www.utah.edu/cpbmetadata/PBCore/coverage.html"</xsd:documentation>
                         </xsd:annotation>
                      </xsd:element>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="coverageType">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="coverageType">
                         <xsd:complexType>
                            <xsd:annotation>
                               <xsd:documentation xml:lang="en">"Whereas the PBCore metadata element
@@ -269,7 +269,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreAudienceLevel">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="audienceLevel"
+                     <xsd:element maxOccurs="1" minOccurs="1" name="audienceLevel"
                         type="pbcore.string.type.base">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor audienceLevel
@@ -288,7 +288,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreAudienceRating">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="audienceRating"
+                     <xsd:element maxOccurs="1" minOccurs="1" name="audienceRating"
                         type="pbcore.string.type.base">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor audienceRating
@@ -310,7 +310,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreCreator">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="creator" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="creator" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor creator identifies a
                               person or organization primarily responsible for creating a media
@@ -344,7 +344,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreContributor">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="contributor" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="contributor" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor contributor identifies
                               a person or organization that has made substantial creative
@@ -374,7 +374,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcorePublisher">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="publisher" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="publisher" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"The descriptor publisher identifies a
                               person or organization primarily responsible for distributing or
@@ -402,7 +402,7 @@
             <xsd:element maxOccurs="unbounded" minOccurs="0" name="pbcoreRightsSummary">
                <xsd:complexType>
                   <xsd:sequence>
-                     <xsd:element maxOccurs="1" minOccurs="0" name="rightsSummary" type="xsd:string">
+                     <xsd:element maxOccurs="1" minOccurs="1" name="rightsSummary" type="xsd:string">
                         <xsd:annotation>
                            <xsd:documentation xml:lang="en">"Use the descriptor rightsSummary as an
                               all-purpose container field to identify information about copyrights
