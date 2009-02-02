@@ -1,9 +1,5 @@
-# 
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
- 
-
 require 'rubygems'
+require 'haml'
 require 'rake'
 require 'rake/clean'
 require 'rake/gempackagetask'
@@ -11,34 +7,15 @@ require 'rake/rdoctask'
 require 'rake/testtask'
 require 'spec/rake/spectask'
 
-spec = Gem::Specification.new do |s|
-  s.name = 'validator'
-  s.version = '0.0.1'
-  s.has_rdoc = true
-  s.extra_rdoc_files = ['README', 'LICENSE']
-  s.summary = 'Your summary here'
-  s.description = s.summary
-  s.author = ''
-  s.email = ''
-  # s.executables = ['your_executable_here']
-  s.files = %w(LICENSE README Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
-  s.require_path = "lib"
-  s.bindir = "bin"
-end
-
-Rake::GemPackageTask.new(spec) do |p|
-  p.gem_spec = spec
-  p.need_tar = true
-  p.need_zip = true
-end
-
 Rake::RDocTask.new do |rdoc|
-  files =['README', 'LICENSE', 'lib/**/*.rb']
+  files = ['README.rdoc', 'COPYING.txt', 'lib/**/*.rb']
   rdoc.rdoc_files.add(files)
-  rdoc.main = "README" # page to start on
-  rdoc.title = "validator Docs"
-  rdoc.rdoc_dir = 'doc/rdoc' # rdoc output folder
+  rdoc.main = "README.rdoc" # page to start on
+  rdoc.title = "PBCore validator Docs"
+  rdoc.rdoc_dir = 'html/rdoc' # rdoc output folder
   rdoc.options << '--line-numbers'
+  rdoc.options << '-cutf-8'
+  rdoc.options << '-Whttp://git.mlcastle.net/?p=validator.git;a=blob;f=%s;hb=HEAD'
 end
 
 Rake::TestTask.new do |t|
@@ -48,3 +25,19 @@ end
 Spec::Rake::SpecTask.new do |t|
   t.spec_files = FileList['spec/**/*.rb']
 end
+
+rule '.html' => ['.haml'] do |t|
+  engine = Haml::Engine.new(File.read(t.source))
+  File.open(t.name, "w") do |file|
+    file.write engine.to_html
+  end
+end
+
+desc 'rebuild the web'
+task :web
+
+FileList['html/*.haml'].each do |haml|
+  task :web => (haml.gsub(/haml$/, 'html'))
+end
+
+task :default => [:web, :rdoc]

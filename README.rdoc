@@ -1,0 +1,5 @@
+= The PBCore Validator
+
+This is a validator for PBCore[http://www.pbcore.org/].
+
+Further documentation is forthcoming.
