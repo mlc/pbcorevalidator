@@ -35,9 +35,9 @@ def fail(cgi, message)
   exit 0
 end
 
-@validator = if cgi.params["file"].respond_to?(:content_type)
+@validator = if cgi.params["file"].respond_to?(:read)
   Validator.new(cgi.params["file"])
-elsif !(cgi.params["textarea"].empty?)
+elsif !(cgi.params["textarea"].empty? || cgi.params["textarea"][0].empty?)
   Validator.new(cgi.params["textarea"][0])
 else
   fail(cgi, "You must provide a PBCore document either by file upload or by pasting into the textarea.")
