@@ -8,7 +8,7 @@ require 'rake/testtask'
 require 'spec/rake/spectask'
 
 Rake::RDocTask.new do |rdoc|
-  files = ['README.rdoc', 'COPYING.txt', 'lib/**/*.rb']
+  files = ['README.rdoc', 'COPYING.txt', '*.rb', 'lib/**/*.rb']
   rdoc.rdoc_files.add(files)
   rdoc.main = "README.rdoc" # page to start on
   rdoc.title = "PBCore validator Docs"

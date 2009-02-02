@@ -2,4 +2,9 @@
 
 This is a validator for PBCore[http://www.pbcore.org/].
 
+You need the folowing gems:
+* haml
+* libxml-ruby
+* rake
+
 Further documentation is forthcoming.
