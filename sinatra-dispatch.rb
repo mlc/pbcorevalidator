@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# PBCore Validator, FastCGI wrapper
+# PBCore Validator, sinatra wrapper
 # Copyright © 2009 Roasted Vermicelli, LLC
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,8 @@ require 'haml'
 require 'sinatra'
 
 require 'lib/validator'
+
+set :host, 'localhost'
 
 set :public, File.dirname(__FILE__) + '/html'
 set :views, File.dirname(__FILE__) + '/templates'
