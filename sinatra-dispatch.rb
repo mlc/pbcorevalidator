@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+# -*- coding: utf-8 -*-
 
 # PBCore Validator, sinatra wrapper
 # Copyright © 2009 Roasted Vermicelli, LLC
@@ -26,17 +27,17 @@ require 'sinatra'
 
 require 'lib/validator'
 
-set :host, 'localhost'
-
-set :public, File.dirname(__FILE__) + '/html'
-set :views, File.dirname(__FILE__) + '/templates'
+get '/' do
+  response['Cache-Control'] = 'public, max-age=7200'
+  haml :index
+end
 
 get '/validator' do
   "Sorry, only POST is supported."
 end
 
 post '/validator' do
-  if params[:file][:tempfile] && params[:file][:tempfile].size > 0
+  if params[:file] && params[:file][:tempfile] && params[:file][:tempfile].size > 0
     @validator = Validator.new(params[:file][:tempfile])
   elsif !params[:textarea].strip.empty?
     @validator = Validator.new(params[:textarea])
