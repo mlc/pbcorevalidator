@@ -1,0 +1,4 @@
+haml
+libxml-ruby
+sinatra
+RedCloth --version '>= 4.1'
