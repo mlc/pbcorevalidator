@@ -28,6 +28,10 @@ require 'sinatra'
 
 require 'lib/validator'
 
+before do
+  content_type "text/html", :charset => "utf-8"
+end
+
 get '/' do
   response['Cache-Control'] = 'public, max-age=7200'
   haml :index
@@ -50,7 +54,7 @@ post '/validator' do
 end
 
 get '/css' do
-  content_type "text/css; charset=utf-8"
+  content_type "text/css", :charset => "utf-8"
   response['Cache-Control'] = 'public, max-age=7200'
   sass :style
 end
