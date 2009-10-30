@@ -23,6 +23,7 @@ require 'rubygems'
 
 require 'cgi'
 require 'haml'
+require 'sass'
 require 'sinatra'
 
 require 'lib/validator'
@@ -46,4 +47,10 @@ post '/validator' do
   end
 
   haml :htmlout
+end
+
+get '/css' do
+  content_type "text/css; charset=utf-8"
+  response['Cache-Control'] = 'public, max-age=7200'
+  sass :style
 end
