@@ -10,6 +10,6 @@ You need the folowing gems:
 If you want to run a webserver, also have:
 * rack
 * sinatra
-* thin
+* unicorn, thin, or your favorite rack-enabled server
 
 Further documentation is forthcoming.
