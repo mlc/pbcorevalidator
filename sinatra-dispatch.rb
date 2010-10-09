@@ -42,10 +42,15 @@ get '/validator' do
 end
 
 post '/validator' do
+  version = params[:version]
+  unless (version && Validator::PBCORE_VERSIONS[version])
+    halt "You must select a PBCore version to validate against." and return
+  end
+
   if params[:file] && params[:file][:tempfile] && params[:file][:tempfile].size > 0
-    @validator = Validator.new(params[:file][:tempfile])
+    @validator = Validator.new(params[:file][:tempfile], version)
   elsif !params[:textarea].strip.empty?
-    @validator = Validator.new(params[:textarea])
+    @validator = Validator.new(params[:textarea], version)
   else
     halt "You must provide a PBCore document either by file upload or by pasting into the textarea."
   end

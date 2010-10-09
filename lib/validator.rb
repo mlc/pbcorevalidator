@@ -23,6 +23,14 @@ class Validator
   # The PBCore namespace
   PBCORE_NAMESPACE = "http://www.pbcore.org/PBCore/PBCoreNamespace.html"
 
+  # List of supported XSDs
+  PBCORE_VERSIONS = {
+#    "1.1" => { :version => "PBCore 1.1", :xsd => "PBCoreXSD_Ver_1-1_Final.xsd" },
+    "1.2" => { :version => "PBCore 1.2", :xsd => "PBCoreSchema_v1-2.xsd" },
+    "1.2.1" => { :version => "PBCore 1.2.1", :xsd => "PBCoreXSD_Ver_1-2-1.xsd" },
+    "1.3" => { :version => "PBCore 1.3", :xsd => "PBCoreXSD-v1.3.xsd" }
+  }.freeze
+
   # A set of predefined value lists, which are recommended in various circumstances.
   module Picklists
     TITLE_TYPES = [
@@ -392,16 +400,18 @@ class Validator
   end
 
   # returns the LibXML::XML::Schema object of the PBCore schema
-  def self.schema
-    @@schema ||= XML::Schema.document(XML::Document.file(File.join(File.dirname(__FILE__), "..", "data", "PBCoreSchema_v1-2.xsd")))
+  def self.schema(pbcore_version)
+    @@schemas ||= {}
+    @@schemas[pbcore_version] ||= XML::Schema.document(XML::Document.file(File.join(File.dirname(__FILE__), "..", "data", PBCORE_VERSIONS[pbcore_version][:xsd])))
   end
 
   # creates a new PBCore validator object, parsing the provided XML.
   #
   # io_or_document can either be an IO object or a String containing an XML document.
-  def initialize(io_or_document)
+  def initialize(io_or_document, pbcore_version = "1.2")
     XML.default_line_numbers = true
     @errors = []
+    @pbcore_version = pbcore_version
     set_rxml_error do
       @xml = io_or_document.respond_to?(:read) ?
         XML::Document.io(io_or_document) :
@@ -415,7 +425,7 @@ class Validator
 
     @schema_checked = true
     set_rxml_error do
-      @xml.validate_schema(Validator.schema)
+      @xml.validate_schema(Validator.schema(@pbcore_version))
     end
   end
 
