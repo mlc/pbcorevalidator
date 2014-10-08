@@ -19,21 +19,15 @@
 
 $: << File.expand_path(File.dirname(__FILE__))
 
-require 'rubygems'
-
+require 'bundler'
 require 'cgi'
-require 'haml'
-require 'sass'
-require 'sinatra'
+Bundler.require
 
 require 'lib/validator'
 
-before do
-  content_type "text/html", :charset => "utf-8"
-end
+class App < Sinatra::Application
 
 get '/' do
-  response['Cache-Control'] = 'public, max-age=7200'
   haml :index
 end
 
@@ -62,4 +56,6 @@ get '/css' do
   content_type "text/css", :charset => "utf-8"
   response['Cache-Control'] = 'public, max-age=7200'
   sass :style
+end
+
 end
