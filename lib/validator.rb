@@ -26,6 +26,7 @@ class Validator
   # List of supported XSDs
   PBCORE_VERSIONS = {
 #    "1.1" => { :version => "PBCore 1.1", :xsd => "PBCoreXSD_Ver_1-1_Final.xsd" },
+    "2.1" => { :version => "PBCore 2.1", :xsd => "pbcore-2.1.xsd" },
     "2.0" => { :version => "PBCore 2.0", :xsd => "PBCoreXSD_v2.xsd" },
     "1.2" => { :version => "PBCore 1.2", :xsd => "PBCoreSchema_v1-2.xsd" },
     "1.2.1" => { :version => "PBCore 1.2.1", :xsd => "PBCoreXSD_Ver_1-2-1.xsd" },
