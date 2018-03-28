@@ -145,55 +145,55 @@ end
 
 # PACKAGING ============================================================
 
-if defined?(Gem)
-  # Load the gemspec using the same limitations as github
-  def spec
-    require 'rubygems' unless defined? Gem::Specification
-    @spec ||= eval(File.read('sinatra.gemspec'))
-  end
-
-  def package(ext='')
-    "pkg/sinatra-#{spec.version}" + ext
-  end
-
-  desc 'Build packages'
-  task :package => %w[.gem .tar.gz].map {|e| package(e)}
-
-  desc 'Build and install as local gem'
-  task :install => package('.gem') do
-    sh "gem install #{package('.gem')}"
-  end
-
-  directory 'pkg/'
-  CLOBBER.include('pkg')
-
-  file package('.gem') => %w[pkg/ sinatra.gemspec] + spec.files do |f|
-    sh "gem build sinatra.gemspec"
-    mv File.basename(f.name), f.name
-  end
-
-  file package('.tar.gz') => %w[pkg/] + spec.files do |f|
-    sh <<-SH
-      git archive \
-        --prefix=sinatra-#{source_version}/ \
-        --format=tar \
-        HEAD | gzip > #{f.name}
-    SH
-  end
-
-  task 'release' => ['test', package('.gem')] do
-    if File.binread("CHANGES") =~ /= \d\.\d\.\d . not yet released$/i
-      fail 'please update changes first' unless %x{git symbolic-ref HEAD} == "refs/heads/prerelease\n"
-    end
-
-    sh <<-SH
-      gem install #{package('.gem')} --local &&
-      gem push #{package('.gem')}  &&
-      git commit --allow-empty -a -m '#{source_version} release'  &&
-      git tag -s v#{source_version} -m '#{source_version} release'  &&
-      git tag -s #{source_version} -m '#{source_version} release'  &&
-      git push && (git push sinatra || true) &&
-      git push --tags && (git push sinatra --tags || true)
-    SH
-  end
-end
+# if defined?(Gem)
+#   # Load the gemspec using the same limitations as github
+#   def spec
+#     require 'rubygems' unless defined? Gem::Specification
+#     @spec ||= eval(File.read('sinatra.gemspec'))
+#   end
+# 
+#   def package(ext='')
+#     "pkg/sinatra-#{spec.version}" + ext
+#   end
+# 
+#   desc 'Build packages'
+#   task :package => %w[.gem .tar.gz].map {|e| package(e)}
+# 
+#   desc 'Build and install as local gem'
+#   task :install => package('.gem') do
+#     sh "gem install #{package('.gem')}"
+#   end
+# 
+#   directory 'pkg/'
+#   CLOBBER.include('pkg')
+# 
+#   file package('.gem') => %w[pkg/ sinatra.gemspec] + spec.files do |f|
+#     sh "gem build sinatra.gemspec"
+#     mv File.basename(f.name), f.name
+#   end
+# 
+#   file package('.tar.gz') => %w[pkg/] + spec.files do |f|
+#     sh <<-SH
+#       git archive \
+#         --prefix=sinatra-#{source_version}/ \
+#         --format=tar \
+#         HEAD | gzip > #{f.name}
+#     SH
+#   end
+# 
+#   task 'release' => ['test', package('.gem')] do
+#     if File.binread("CHANGES") =~ /= \d\.\d\.\d . not yet released$/i
+#       fail 'please update changes first' unless %x{git symbolic-ref HEAD} == "refs/heads/prerelease\n"
+#     end
+# 
+#     sh <<-SH
+#       gem install #{package('.gem')} --local &&
+#       gem push #{package('.gem')}  &&
+#       git commit --allow-empty -a -m '#{source_version} release'  &&
+#       git tag -s v#{source_version} -m '#{source_version} release'  &&
+#       git tag -s #{source_version} -m '#{source_version} release'  &&
+#       git push && (git push sinatra || true) &&
+#       git push --tags && (git push sinatra --tags || true)
+#     SH
+#   end
+# end
