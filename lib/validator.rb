@@ -131,7 +131,10 @@ class Validator
      "Videotape Recordist", "Vidifont Operator", "Vocalist", "VTR Recordist",
      "Wardrobe", "Writer", "Other"
     ]
-
+    
+    COVERAGE_TYPES = [
+		'Spatial','Temporal'
+	]
     PUBLISHER_ROLES = [
      "Copyright Holder", "Distributor", "Presenter", "Publisher",
      "Release Agent", "Other"
@@ -299,6 +302,10 @@ class Validator
      "Interactive Resource", "Moving Image", "Physical Object", "Presentation",
      "Service", "Software", "Sound", "Static Image", "Text"
     ]
+    
+    INSTANTIATION_MEDIA_TYPES = [ 
+		'Moving Image', 'Audio'
+	]
 
     GENERATIONS = [
      "Artifact/Award", "Artifact/Book", "Artifact/Costume",
@@ -451,6 +458,8 @@ class Validator
     check_picklist('formatPhysical', Picklists::PHYSICAL_FORMATS)
     check_picklist('formatDigital', Picklists::DIGITAL_FORMATS)
     check_picklist('formatMediaType', Picklists::MEDIA_TYPES)
+    check_picklist('instantiationMediaType', Picklists::INSTANTIATION_MEDIA_TYPES , 'You’re using a value for instantiationMediaType that is neither Moving Image nor Audio. While this is valid, we recommend using one of the standardized values from the controlled vocabulary for this element: http://pbcore.org/pbcore-controlled-vocabularies/instantiationmediatype-vocabulary/' )
+    check_picklist('coverageType', Picklists::COVERAGE_TYPES , 'It looks like you’re using a value for coverageType that is neither Spatial nor Temporal. For valid PBCore, you must use one of the standardized values from the controlled vocabulary for this element: http://metadataregistry.org/concept/list/vocabulary_id/149.html' )
     check_picklist('formatGenerations', Picklists::GENERATIONS)
     check_picklist('formatColors', Picklists::FORMAT_COLORS)
     check_picklist('essenceTrackType', Picklists::ESSENCE_TRACK_TYPES)
@@ -503,12 +512,12 @@ class Validator
   end
 
   private
-  def check_picklist(elt, picklist)
+  def check_picklist(elt, picklist, msg = "")
     each_elt(elt) do |node|
       if node.content.strip.empty?
         @errors << "#{elt} on #{node.line_num} is empty. Perhaps consider leaving that element out instead."
       elsif !picklist.any?{|i| i.downcase == node.content.downcase}
-        @errors << "“#{node.content}” on line #{node.line_num} is not in the PBCore suggested picklist value for #{elt}."
+        @errors << "“#{node.content}” on line #{node.line_num} is not in the PBCore suggested picklist value for #{elt}.  " + msg.to_s 
       end
     end
     check_lists(elt)
@@ -536,7 +545,12 @@ class Validator
     each_elt("pbcoreInstantiation") do |node|
       if node.find(".//pbcore:formatDigital", "pbcore:#{PBCORE_NAMESPACE}").size > 0 &&
           node.find(".//pbcore:formatPhysical", "pbcore:#{PBCORE_NAMESPACE}").size > 0
-        @errors << "It looks like the instantiation on line #{node.line_num} contains both a formatDigital and a formatPhysical element. This is probably not what you intended."
+        @errors << "It looks like the instantiation on line #{node.line_num} contains both a formatDigital and a formatPhysical element. This is valid, but not recommended in PBCore XML."
+      else 
+      if node.find(".//pbcore:instantiationDigital", "pbcore:#{PBCORE_NAMESPACE}").size > 0 &&
+          node.find(".//pbcore:instantiationPhysical", "pbcore:#{PBCORE_NAMESPACE}").size > 0
+        @errors << "It looks like the instantiation on line #{node.line_num} contains both a instantiationDigital and a instantiationPhysical element. This is valid, but not recommended in PBCore XML."  
+      end
       end
     end
   end
