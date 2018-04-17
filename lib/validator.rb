@@ -445,6 +445,8 @@ class Validator
     return if @practices_checked || @xml.nil?
     @practices_checked = true
     
+    
+    
     check_picklist('titleType', Picklists::TITLE_TYPES)
     check_lists('subject')
     check_picklist('descriptionType', Picklists::DESCRIPTION_TYPES)
@@ -467,6 +469,53 @@ class Validator
     check_names('contributor')
     check_names('publisher')
     check_only_one_format
+    
+    
+    
+    
+    
+    check_min_one_subelements('pbcoreCollection',['pbcoreDescriptionDocument'],"")
+    ['pbcoreDescriptionDocument','pbcorePart'].each do |parentname| check_min_one_subelements(parentname,['pbcoreIdentifier','pbcoreTitle','pbcoreDescription'],"") ; end ;
+
+    check_element_has_attribute('pbcoreIdentifier','source',"")
+    
+#     check_min_one_subelements('pbcoreRelation',['pbcoreRelationType','pbcoreRelationIdentifier'],"")
+#     check_max_one_subelements('pbcoreRelation',['pbcoreRelationIdentifier','pbcoreRelationType'],"")
+    ['pbcoreRelationType','pbcoreRelationIdentifier'].each do |subname| check_only_one_subelement('pbcoreRelation',subname.split(),"must contain two subelements and only one '#{subname}.'  Please repeat the entire 'pbcoreRelation' container element to express each relationship.") ; end ; 
+
+    check_only_one_subelement('pbcoreCoverage',['coverage'],"should contain only one 'coverage' subelement.  Please repeat the entire pbcoreCoverage container element for each instance of coverage.")
+
+    check_only_one_subelement('pbcoreCreator',['creator'],"should contain only one 'creator' subelement.  Please repeat the entire pbcoreCreator container element for each instance of creator.")    
+    check_only_one_subelement('pbcoreContributor',['contributor'],"should contain only one 'contributor' subelement.  Please repeat the entire pbcoreContributor container element for each instance of contributor.")    
+    check_only_one_subelement('pbcorePublisher',['publisher'],"should contain only one 'publisher' subelement.  Please repeat the entire pbcorePublisher container element for each instance of publisher.")        
+    check_only_one_subelement('pbcoreRightsSummary',['rightsSummary', 'rightsLink','rightsEmbedded'],"should contain only one subelement.  Please repeat the entire pbcoreRightsSummary container element for each rightsSummary, rightsLink, or rightsEmbedded.")
+    ['pbcoreInstantiationDocument','instantiationPart'].each do |parentname| check_min_one_subelements(parentname,['instantiationIdentifier','instantiationLocation'],"") ; end ;
+    check_element_has_attribute('instantiationIdentifier','source',"")
+    ['pbcoreInstantiationDocument','instantiationPart'].each do |parentname| check_max_one_subelements(parentname,['instantiationPhysical','instantiationDigital','instantiationStandard','instantiationLocation','instantiationMediaType','instantiationFileSize','instantiationTimeStart','instantiationDuration','instantiationDataRate','instantiationColors','instantiationTracks','instantiationChannelConfiguration','instantiationChannelConfiguration'],"") ; end ;
+
+    check_only_one_subelement('instantiationRights',['rightsSummary', 'rightsLink','rightsEmbedded'],"should contain only one subelement.  Please repeat the entire instantiationRights container element for each rightsSummary, rightsLink, or rightsEmbedded.")
+
+	['pbcoreExtension','instantiationExtension'].each do |parentname| check_only_one_subelement(parentname,['extensionWrap','extensionEmbedded'],"should contain only one subelement.  Please repeat the entire '#{parentname}' container element for each 'extensionWrap' or 'extensionEmbedded'") ; end ;
+	['extensionElement','extensionValue'].each do |subname|  check_only_one_subelement('extensionWrap',subname.split(),"must contain one '#{subname}' subelement.") ; end ;
+    
+    
+    check_valid_characters(['instantiationFileSize', 'instantiationDataRate', 'essenceTrackDataRate', 'essenceTrackFrameRate', 'essenceTrackPlaybackSpeed', 'essenceTrackSamplingRate', 'essenceTrackBitDepth', 'essenceTrackFrameSize', 'essenceTrackAspectRatio'],"g/[0-9]:x\///", msg = "For best practice, this technical element should only contain numeric values. To express a unit of measure for this element, we recommend using the @unitsOfMeasure attribute.")
+    check_valid_characters(['instantiationTimeStart', 'instantiationDuration', 'essenceTrackTimeStart', 'essenceTrackDuration'],"g/[0-9]:\.//", msg = "This is valid, but we recommend using a timestamp format for this element, such as HH:MM:SS:FF or HH:MM:SS.mmm or S.mmm.")
+    check_valid_length_codes(['instantiationLanguage', 'essenceTrackLanguage'], ';', "For valid PBCore, please use one of the ISO 639.2 or 639.3 standard language codes, which can be found at http://www.loc.gov/standards/iso639-2/ and http://www-01.sil.org/iso639-3/codes.asp. You can describe more than one language in the element by separating two three-letter codes with a semicolon, i.e. eng;fre.")
+    
+    # sort the error messages by line number 
+    tmperrors=[]
+    lastline=@xml.to_s.gsub(13.chr+10.chr,10.chr).tr(13.chr,10.chr).split(10.chr).count # figure out how to get the right number:  @xml.last.line_num isn't it 
+    (1..lastline).reverse_each do |lnum|  @errors.select {|msg| msg.to_s.match(" line #{lnum.to_s} ") || msg.to_s.match(" at :#{lnum.to_s}" + 46.chr)}.each do |y| tmperrors<< y if not tmperrors.include?(y); end ; end
+	# wacky that each item in tmperrors array is a 1-count array
+    if @errors.to_s.include?(' element is not expected')
+		tmperrors << ["===="]
+		tmperrors << ["Error(s) below about 'expected' elements are about what appears out of the expected order:  missing (required) elements will be cited further; otherwise, consult PBCore documentation for proper sequencing."] 
+	end
+
+	# is it necessary to examine @errors for things *not* in tmperrors?  they would fail assumption of line# test
+    @errors = tmperrors.reverse.reject {|x| x == []}.flatten
+    
   end
 
   # returns true iff the document is perfectly okay
@@ -554,6 +603,74 @@ class Validator
       end
     end
   end
+  
+  def check_element_has_attribute(elementname,attributename,msg="")
+       each_elt(elementname.to_s) do |node|
+          isMissing=true
+          node.attributes.each {|attribute| isMissing=false if attribute.name == attributename }
+          # node.attributes.get_attribute(attributename)
+          if isMissing
+              @errors << "Element '#{elementname}' at line #{node.line_num} must contain the attribute '#{attributename}' " + msg.to_s
+          end
+       end
+  end
+  
+  def check_only_one_subelement(parentname,subnames,msg = "")
+#    subsum=0
+    each_elt(parentname.to_s) do |node|
+        subsum=0
+    	subnames.each do |subname|
+			subsum = subsum + node.find("./pbcore:#{subname}", "pbcore:#{PBCORE_NAMESPACE}").size 
+		end
+		if subsum != 1 
+			@errors << "Element '#{parentname}' near line #{node.line_num} " + msg.to_s
+		end
+	end
+  end
+  
+  def check_max_one_subelements(parentname,subnames,msg = "")
+    each_elt(parentname.to_s) do |node| 
+    	subnames.each do |subname|
+			subsum = node.find("./pbcore:#{subname}", "pbcore:#{PBCORE_NAMESPACE}").size 
+			if subsum > 1 
+				@errors << "Element '#{subname}' near line #{node.line_num} isn’t repeatable. For valid PBCore, please find another way to incorporate that information.  " + msg.to_s
+			end
+		end
+	end
+  end
+  
+  def check_min_one_subelements(parentname,subnames,msg = "")
+	each_elt(parentname.to_s) do |node| 
+		subnames.each do |subname|
+			subsum = node.find("./pbcore:#{subname}", "pbcore:#{PBCORE_NAMESPACE}").size 
+			if subsum < 1 
+				@errors << "Element '#{parentname}' near line #{node.line_num} is missing required subelement '#{subname}.'  For valid PBCore, please add a value for this element." + msg.to_s
+			end
+		end
+	end 
+  end
+
+  def check_valid_characters(elements_array,validstring = "", msg = "")
+    elements_array.each do |elt|
+		each_elt(elt.to_s) do |node|
+			if node.content.tr(validstring,"") != "" 
+				@errors << "Element '#{node.name}' at line #{node.line_num} contains invalid #{node.content.tr(validstring,"").length} characters.  " + msg.to_s
+			end
+		end
+	end
+  end
+  
+  def check_valid_length_codes(elements_array, delimiter = ';' ,msg = "")
+    elements_array.each do |elt|
+		each_elt(elt.to_s) do |node|
+			xcount=node.content.split(delimiter).select{|x| x.length < 2 || x.length > 3}.length
+			if xcount != 0 
+				@errors << "Element '#{node.name}' at line #{node.line_num} contains #{xcount} invalid value#{'s' if xcount > 1}.  " + msg.to_s
+			end
+		end
+	end
+  end
+
 
   def each_elt(elt)
     @xml.find("//pbcore:#{elt}", "pbcore:#{PBCORE_NAMESPACE}").each do |node|
